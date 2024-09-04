@@ -62,6 +62,19 @@ def main(args):
         batch_size=config.batch_size_valid, shuffle=False, num_workers=config.num_workers, pin_memory=True
     )
 
+    for weights in weights_lst:
+        print('\tInferencing {}...'.format(weights))
+        state_dict = torch.load(weights, map_location='cpu')
+        state_dict = check_state_dict(state_dict)
+        model.load_state_dict(state_dict)
+        model = model.to(device)
+        inference(
+            model, data_loader_test=data_loader_test, pred_root=args.pred_root,
+            method='--'.join([w.rstrip('.pth') for w in weights.split(os.sep)[-2:]]),
+            testset='custom',
+            device=config.device
+        )
+
     
     # for testset in args.testsets.split('+'):
     #     print('>>>> Testset: {}...'.format(testset))
@@ -69,20 +82,20 @@ def main(args):
     #         dataset=MyData(testset, image_size=config.size, is_train=False),
     #         batch_size=config.batch_size_valid, shuffle=False, num_workers=config.num_workers, pin_memory=True
     #     )
-        for weights in weights_lst:
-            if int(weights.strip('.pth').split('epoch_')[-1]) % 1 != 0:
-                continue
-            print('\tInferencing {}...'.format(weights))
-            # model.load_state_dict(torch.load(weights, map_location='cpu'))
-            state_dict = torch.load(weights, map_location='cpu')
-            state_dict = check_state_dict(state_dict)
-            model.load_state_dict(state_dict)
-            model = model.to(device)
-            inference(
-                model, data_loader_test=data_loader_test, pred_root=args.pred_root,
-                method='--'.join([w.rstrip('.pth') for w in weights.split(os.sep)[-2:]]),
-                testset=testset, device=config.device
-            )
+        # for weights in weights_lst:
+        #     if int(weights.strip('.pth').split('epoch_')[-1]) % 1 != 0:
+        #         continue
+        #     print('\tInferencing {}...'.format(weights))
+        #     # model.load_state_dict(torch.load(weights, map_location='cpu'))
+        #     state_dict = torch.load(weights, map_location='cpu')
+        #     state_dict = check_state_dict(state_dict)
+        #     model.load_state_dict(state_dict)
+        #     model = model.to(device)
+        #     inference(
+        #         model, data_loader_test=data_loader_test, pred_root=args.pred_root,
+        #         method='--'.join([w.rstrip('.pth') for w in weights.split(os.sep)[-2:]]),
+        #         testset=testset, device=config.device
+        #     )
 
 
 if __name__ == '__main__':
