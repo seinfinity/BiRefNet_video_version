@@ -56,12 +56,19 @@ def main(args):
         key=lambda x: int(x.split('epoch_')[-1].split('.pth')[0]),
         reverse=True
     )
-    for testset in args.testsets.split('+'):
-        print('>>>> Testset: {}...'.format(testset))
-        data_loader_test = torch.utils.data.DataLoader(
-            dataset=MyData(testset, image_size=config.size, is_train=False),
-            batch_size=config.batch_size_valid, shuffle=False, num_workers=config.num_workers, pin_memory=True
-        )
+
+    data_loader_test = torch.utils.data.DataLoader(
+        dataset=MyData(args.data_dir, image_size=config.size, is_train=False),
+        batch_size=config.batch_size_valid, shuffle=False, num_workers=config.num_workers, pin_memory=True
+    )
+
+    
+    # for testset in args.testsets.split('+'):
+    #     print('>>>> Testset: {}...'.format(testset))
+    #     data_loader_test = torch.utils.data.DataLoader(
+    #         dataset=MyData(testset, image_size=config.size, is_train=False),
+    #         batch_size=config.batch_size_valid, shuffle=False, num_workers=config.num_workers, pin_memory=True
+    #     )
         for weights in weights_lst:
             if int(weights.strip('.pth').split('epoch_')[-1]) % 1 != 0:
                 continue
